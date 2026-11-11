@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Land</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">Add Land</div>
+
+<div class="container">
+<form method="post">
+    <label>Farmer ID</label>
+    <input type="number" name="farmer_id" required>
+
+    <label>Area</label>
+    <input type="text" name="area" required>
+
+    <label>Location</label>
+    <input type="text" name="location" required>
+
+    <label>Soil Type</label>
+    <input type="text" name="soil_type" required>
+
+    <button type="submit">Save Land</button>
+</form>
+
+<div class="back">
+    <a href="/">Go Back</a>
+</div>
+</div>
+
+</body>
+</html>

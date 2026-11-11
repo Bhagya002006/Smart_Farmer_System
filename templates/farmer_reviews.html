@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Reviews | Smart Farmer System</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f1;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        h1, h2 { color: #21632e; }
+        h1 { text-align: center; }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 8px;
+            font-weight: bold;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .stars input { display: none; }
+
+        .stars label {
+            margin: 0;
+            font-size: 32px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .stars label:hover,
+        .stars label:hover ~ label,
+        .stars input:checked ~ label {
+            color: #f5b301;
+        }
+
+        button, .back-btn {
+            display: inline-block;
+            padding: 12px 18px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button:hover, .back-btn:hover {
+            background: #195c24;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .success { background: #e4f5e5; color: #21632e; }
+        .error { background: #fff0f0; color: #a32626; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #dce5dc;
+            text-align: center;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        .rating {
+            color: #e4a600;
+            font-weight: bold;
+        }
+
+        .empty {
+            padding: 15px;
+            background: #fff5e6;
+            border-radius: 6px;
+        }
+
+        @media(max-width: 600px) {
+            body { padding: 12px; }
+            .card { padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>⭐ Farmer Reviews & Ratings</h1>
+
+    <div class="card">
+        <h2>Submit Your Review</h2>
+
+        {% if message %}
+            <div class="message {{ message_type }}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        {% if available_orders %}
+            <form method="POST" action="{{ url_for('farmer_reviews') }}">
+
+                <label for="order_id">Select Delivered Order</label>
+
+                <select name="order_id" id="order_id" required>
+                    <option value="">Choose Order</option>
+
+                    {% for order in available_orders %}
+                        <option value="{{ order[0] }}">
+                            Order #{{ order[0] }} |
+                            Consumer: {{ order[1] }} |
+                            Farmer: {{ order[2] }} |
+                            Crop: {{ order[3] }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>Give Rating</label>
+
+                <div class="stars">
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="5 stars">★</label>
+
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars">★</label>
+
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars">★</label>
+
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars">★</label>
+
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star">★</label>
+                </div>
+
+                <label for="review">Write Your Review</label>
+
+                <textarea
+                    name="review"
+                    id="review"
+                    placeholder="Share your experience with this farmer..."
+                    maxlength="2000"
+                ></textarea>
+
+                <button type="submit">Submit Review</button>
+            </form>
+        {% else %}
+            <p class="empty">
+                No delivered orders are currently available for review.
+                A review can be submitted after an order is delivered.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Customer Reviews</h2>
+
+        {% if reviews %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Review ID</th>
+                        <th>Farmer</th>
+                        <th>Consumer</th>
+                        <th>Order ID</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                        <th>Date</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in reviews %}
+                        <tr>
+                            <td>{{ item[0] }}</td>
+                            <td>{{ item[1] }}</td>
+                            <td>{{ item[2] }}</td>
+                            <td>{{ item[3] }}</td>
+                            <td class="rating">
+                                {{ "★" * item[4] }}{{ "☆" * (5 - item[4]) }}
+                            </td>
+                            <td>{{ item[5] or "No written comment" }}</td>
+                            <td>{{ item[6] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty">No farmer reviews have been submitted yet.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-btn">
+        Back to Home
+    </a>
+
+</div>
+</body>
+</html>

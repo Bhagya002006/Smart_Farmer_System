@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Farmer System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">Smart Farmer System</div>
+
+
+<div class="menu">
+
+    <!-- NEW MENU -->
+    <a href="{{ url_for('farmers_crops') }}">
+        Farmers & Available Crops
+    </a>
+    <a href="{{ url_for('sales') }}">Record Sales</a>
+
+    <a href="{{ url_for('sales_analytics') }}">Sales Analytics</a>
+    <a href="{{ url_for('soil_test') }}">Soil Testing</a>
+
+    <a href="{{ url_for('farmer_reviews') }}">Farmer Reviews & Ratings</a>
+    <a href="/farmer">Add Farmer</a>
+    <a href="/land">Add Land</a>
+    <a href="/crop">Add Crop</a>
+    <a href="/consumer">Add Consumer</a>
+    <a href="/sales">Add Sales</a>
+    <a href="/orders">Place Order</a>
+    <a href="/view">View All Data</a>
+
+</div>
+
+
+</body>
+</html>

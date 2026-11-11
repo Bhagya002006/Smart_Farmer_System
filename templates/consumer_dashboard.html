@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consumer Dashboard</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">Consumer Dashboard</div>
+
+<div class="market-container">
+
+    <h2>Welcome, {{ consumer[1] }}</h2>
+
+    <p><strong>Consumer ID:</strong> {{ consumer[0] }}</p>
+    <p><strong>Phone:</strong> {{ consumer[2] }}</p>
+
+    <div class="dashboard-grid">
+
+        <div class="farmer-card">
+            <h3>Total Orders</h3>
+            <h2>{{ total_orders }}</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Active Orders</h3>
+            <h2>{{ active_orders }}</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Total Spent</h3>
+            <h2>₹{{ total_spent }}</h2>
+        </div>
+
+    </div>
+
+    <h2>My Order History</h2>
+
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Crop</th>
+            <th>Farmer</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Status</th>
+        </tr>
+
+        {% for order in orders %}
+        <tr>
+            {% for value in order %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">No orders found.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+
+</div>
+
+</body>
+</html>

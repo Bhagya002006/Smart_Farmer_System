@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Record Sales | Smart Farmer System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f1;
+            color: #333;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #21632e;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 8px;
+            font-weight: bold;
+            color: #285b32;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #287c32;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #195c24;
+        }
+
+        .back-btn {
+            display: block;
+            width: fit-content;
+            margin: 20px auto 0;
+            padding: 11px 20px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back-btn:hover {
+            background: #333;
+        }
+
+        .note {
+            background: #edf8ed;
+            padding: 12px;
+            border-radius: 6px;
+            color: #285b32;
+            font-size: 14px;
+            margin-top: 18px;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #a32626;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .success {
+            background: #edf8ed;
+            color: #21632e;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        @media(max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>💰 Record Crop Sales</h1>
+
+        <p class="subtitle">
+            Enter the details of your crop sales.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="{{ 'success' if category == 'success' else 'error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('sales') }}">
+
+            <label for="crop_id">Crop ID</label>
+
+            <input
+                type="number"
+                id="crop_id"
+                name="crop_id"
+                min="1"
+                placeholder="Enter crop ID"
+                required
+            >
+
+            <label for="quantity_sold">Quantity Sold (kg)</label>
+
+            <input
+                type="number"
+                id="quantity_sold"
+                name="quantity_sold"
+                min="1"
+                placeholder="Enter quantity sold"
+                required
+            >
+
+            <label for="income">Total Income (₹)</label>
+
+            <input
+                type="number"
+                id="income"
+                name="income"
+                min="0.01"
+                step="0.01"
+                placeholder="Enter total income"
+                required
+            >
+
+            <div class="note">
+                Enter the actual total amount received for this sale.
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Save Sales Record
+            </button>
+
+        </form>
+
+        <a href="{{ url_for('index') }}" class="back-btn">
+            Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

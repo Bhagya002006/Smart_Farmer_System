@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Tracking | Smart Farmer System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f7f2;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #21632e;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #687568;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            padding: 11px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        button, .back-btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button:hover, .back-btn:hover {
+            background: #195c24;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 13px;
+            border: 1px solid #dce5dc;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .placed {
+            background: #fff2cc;
+            color: #856404;
+        }
+
+        .confirmed {
+            background: #dceeff;
+            color: #14558a;
+        }
+
+        .shipped {
+            background: #e9ddff;
+            color: #6235a0;
+        }
+
+        .delivered {
+            background: #d9f2df;
+            color: #21632e;
+        }
+
+        .cancelled {
+            background: #ffe0e0;
+            color: #a32626;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            background: #d5ddd5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .step.active {
+            color: #21632e;
+            font-weight: bold;
+        }
+
+        .step.active .step-circle {
+            background: #287c32;
+        }
+
+        .message {
+            padding: 13px;
+            border-radius: 6px;
+            background: #edf8ed;
+            color: #21632e;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            padding: 13px;
+            border-radius: 6px;
+            background: #fff0f0;
+            color: #a32626;
+            margin-bottom: 15px;
+        }
+
+        .back-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .timeline {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .step {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .step-circle {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📦 Order Tracking</h1>
+
+    <p class="subtitle">
+        Track your crop orders and check their current status.
+    </p>
+
+    <div class="card">
+
+        <h2>Search Order</h2>
+
+        <form method="GET"
+              action="{{ url_for('order_tracking') }}"
+              class="search-form">
+
+            <input type="number"
+                   name="order_id"
+                   placeholder="Enter Order ID"
+                   min="1"
+                   value="{{ request.args.get('order_id', '') }}">
+
+            <button type="submit">Track Order</button>
+
+        </form>
+
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ 'error' if category == 'error' else 'message' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if order %}
+
+        <div class="card">
+
+            <h2>Order Details</h2>
+
+            <div class="table-container">
+
+                <table>
+                    <tr>
+                        <th>Order ID</th>
+                        <td>{{ order.order_id }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Consumer Name</th>
+                        <td>{{ order.consumer_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Farmer Name</th>
+                        <td>{{ order.farmer_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Crop Name</th>
+                        <td>{{ order.crop_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Quantity</th>
+                        <td>{{ order.quantity_kg }} kg</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Price</th>
+                        <td>₹{{ order.total_price }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Order Status</th>
+                        <td>
+                            <span class="status {{ order.order_status|lower }}">
+                                {{ order.order_status }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <h3>Order Progress</h3>
+
+            {% set status = order.order_status|lower %}
+
+            {% if status == 'placed' %}
+                {% set progress = 1 %}
+            {% elif status == 'confirmed' %}
+                {% set progress = 2 %}
+            {% elif status == 'shipped' %}
+                {% set progress = 3 %}
+            {% elif status == 'delivered' %}
+                {% set progress = 4 %}
+            {% else %}
+                {% set progress = 0 %}
+            {% endif %}
+
+            {% if status == 'cancelled' %}
+
+                <div class="error">
+                    This order has been cancelled.
+                </div>
+
+            {% else %}
+
+                <div class="timeline">
+
+                    <div class="step {{ 'active' if progress >= 1 else '' }}">
+                        <div class="step-circle">1</div>
+                        Order Placed
+                    </div>
+
+                    <div class="step {{ 'active' if progress >= 2 else '' }}">
+                        <div class="step-circle">2</div>
+                        Confirmed
+                    </div>
+
+                    <div class="step {{ 'active' if progress >= 3 else '' }}">
+                        <div class="step-circle">3</div>
+                        Shipped
+                    </div>
+
+                    <div class="step {{ 'active' if progress >= 4 else '' }}">
+                        <div class="step-circle">4</div>
+                        Delivered
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    {% elif request.args.get('order_id') %}
+
+        <div class="card">
+            <p class="error">
+                No order found with this Order ID.
+                Please check the ID and try again.
+            </p>
+        </div>
+
+    {% endif %}
+
+    {% if orders %}
+
+        <div class="card">
+
+            <h2>All Orders</h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Consumer</th>
+                            <th>Crop</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Track</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for item in orders %}
+
+                        <tr>
+                            <td>{{ item.order_id }}</td>
+                            <td>{{ item.consumer_name }}</td>
+                            <td>{{ item.crop_name }}</td>
+                            <td>{{ item.quantity_kg }} kg</td>
+                            <td>₹{{ item.total_price }}</td>
+
+                            <td>
+                                <span class="status {{ item.order_status|lower }}">
+                                    {{ item.order_status }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <a href="{{ url_for('order_tracking', order_id=item.order_id) }}">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+    <div class="back-container">
+        <a href="{{ url_for('index') }}" class="back-btn">
+            Back to Home
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

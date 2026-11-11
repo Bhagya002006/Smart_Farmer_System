@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Crop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">Add Crop</div>
+
+<div class="container">
+<form method="post">
+    <label>Farmer ID</label>
+    <input type="number" name="farmer_id" required>
+
+    <label>Crop Name</label>
+    <input type="text" name="crop_name" required>
+
+    <label>Price per KG</label>
+    <input type="number" name="price_per_kg" required>
+
+    <label>Quantity (KG)</label>
+    <input type="number" name="quantity_kg" required>
+
+    <label>Season</label>
+    <input type="text" name="season" required>
+
+    <button type="submit">Save Crop</button>
+</form>
+
+<div class="back">
+    <a href="/">Go Back</a>
+</div>
+</div>
+
+</body>
+</html>

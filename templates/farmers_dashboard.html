@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farmer Dashboard</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="header">Farmer Dashboard</div>
+
+<div class="market-container">
+
+    <h2>Welcome, {{ farmer[1] }}</h2>
+
+    <p><strong>Farmer ID:</strong> {{ farmer[0] }}</p>
+    <p><strong>Phone:</strong> {{ farmer[2] }}</p>
+    <p><strong>Address:</strong> {{ farmer[3] }}</p>
+
+    <div class="dashboard-grid">
+
+        <div class="farmer-card">
+            <h3>Total Crops</h3>
+            <h2>{{ total_crops }}</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Available Stock</h3>
+            <h2>{{ available_stock }} kg</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Total Orders</h3>
+            <h2>{{ total_orders }}</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Pending Orders</h3>
+            <h2>{{ pending_orders }}</h2>
+        </div>
+
+        <div class="farmer-card">
+            <h3>Delivered Revenue</h3>
+            <h2>₹{{ total_earnings }}</h2>
+        </div>
+
+    </div>
+
+    <h2>My Crops</h2>
+
+    <table>
+        <tr>
+            <th>Crop ID</th>
+            <th>Crop Name</th>
+            <th>Price/KG</th>
+            <th>Quantity</th>
+            <th>Season</th>
+        </tr>
+
+        {% for crop in crops %}
+        <tr>
+            <td>{{ crop[0] }}</td>
+            <td>{{ crop[2] }}</td>
+            <td>₹{{ crop[3] }}</td>
+            <td>{{ crop[4] }} kg</td>
+            <td>{{ crop[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Orders Received</h2>
+
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Crop ID</th>
+            <th>Consumer</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Status</th>
+        </tr>
+
+        {% for order in farmer_orders %}
+        <tr>
+            {% for value in order %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+
+</div>
+
+</body>
+</html>

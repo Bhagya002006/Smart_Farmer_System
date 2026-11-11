@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Place Order</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h2>Place Order</h2>
+
+<form method="POST">
+    <label>Consumer ID:</label><br>
+    <input type="number" name="consumer_id" required><br><br>
+
+    <label>Crop ID:</label><br>
+    <input type="number" name="crop_id" required><br><br>
+
+    <label>Quantity (kg):</label><br>
+    <input type="number" name="quantity_kg" required><br><br>
+
+    <button type="submit">Place Order</button>
+</form>
+
+<br>
+<a href="/">Back</a>
+
+</body>
+</html>

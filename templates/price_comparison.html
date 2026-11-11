@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Price Comparison | Smart Farmer System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f3f7f2;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #21632e;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #687568;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button, .back-btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button:hover, .back-btn:hover {
+            background: #195c24;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 13px;
+            border: 1px solid #dce5dc;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        .lowest-price {
+            background: #e3f6e5;
+            color: #21632e;
+            font-weight: bold;
+        }
+
+        .lowest-badge {
+            display: inline-block;
+            background: #287c32;
+            color: white;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .empty-message {
+            padding: 15px;
+            background: #fff5e6;
+            border-radius: 6px;
+            color: #805b20;
+        }
+
+        .back-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌾 Crop Price Comparison</h1>
+
+    <p class="subtitle">
+        Compare crop prices offered by different farmers
+        and find the best available price.
+    </p>
+
+    <div class="card">
+
+        <h2>Search Crop</h2>
+
+        <form method="GET"
+              action="{{ url_for('price_comparison') }}"
+              class="search-form">
+
+            <input type="text"
+                   name="crop_name"
+                   placeholder="Enter crop name (e.g. Rice, Wheat, Tomato)"
+                   value="{{ request.args.get('crop_name', '') }}">
+
+            <button type="submit">Compare Prices</button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Available Crop Prices</h2>
+
+        {% if crops %}
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Crop Name</th>
+                            <th>Farmer Name</th>
+                            <th>Farmer Location</th>
+                            <th>Price per kg</th>
+                            <th>Available Quantity</th>
+                            <th>Season</th>
+                            <th>Price Comparison</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for crop in crops %}
+
+                        <tr class="{% if crop.is_lowest %}lowest-price{% endif %}">
+
+                            <td>{{ crop.crop_name }}</td>
+
+                            <td>{{ crop.farmer_name }}</td>
+
+                            <td>{{ crop.location }}</td>
+
+                            <td>₹{{ crop.price_per_kg }}</td>
+
+                            <td>{{ crop.quantity_kg }} kg</td>
+
+                            <td>{{ crop.season }}</td>
+
+                            <td>
+                                {% if crop.is_lowest %}
+                                    <span class="lowest-badge">
+                                        Lowest Price
+                                    </span>
+                                {% else %}
+                                    Compare
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <p class="empty-message">
+                No crop prices found. Add crops with available
+                quantities or search for another crop.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="back-container">
+        <a href="{{ url_for('index') }}" class="back-btn">
+            Back to Home
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Disease Detection | Smart Farmer System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f1;
+            color: #333;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #21632e;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #687568;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 8px;
+            color: #285b32;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input[type="file"] {
+            background: #f8fbf7;
+        }
+
+        .preview {
+            display: none;
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .submit-btn, .back-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+        }
+
+        .submit-btn:hover, .back-btn:hover {
+            background: #195c24;
+        }
+
+        .result {
+            background: #edf8ed;
+            border-left: 5px solid #287c32;
+            padding: 18px;
+            border-radius: 7px;
+            margin-top: 20px;
+        }
+
+        .result h2 {
+            color: #21632e;
+            margin-top: 0;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #a32626;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .back-container {
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌱 Crop Disease Detection</h1>
+
+    <p class="subtitle">
+        Upload a crop leaf image to check for possible diseases.
+    </p>
+
+    <div class="card">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ 'error' if category == 'error' else 'result' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('disease_detection') }}"
+              enctype="multipart/form-data">
+
+            <label for="farmer_id">Select Farmer</label>
+
+            <select name="farmer_id" id="farmer_id" required>
+                <option value="">Choose Farmer</option>
+
+                {% for farmer in farmers %}
+                    <option value="{{ farmer[0] }}"
+                        {% if selected_farmer_id is defined
+                              and selected_farmer_id|string == farmer[0]|string %}
+                            selected
+                        {% endif %}>
+                        {{ farmer[1] }} (ID: {{ farmer[0] }})
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="leaf_image">Upload Crop Leaf Image</label>
+
+            <input type="file"
+                   name="leaf_image"
+                   id="leaf_image"
+                   accept="image/png,image/jpeg,image/jpg"
+                   required>
+
+            <div class="preview" id="imagePreview">
+                <p><strong>Selected Image Preview</strong></p>
+                <img id="previewImage" src="" alt="Crop leaf preview">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Detect Crop Disease
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if result %}
+        <div class="card result">
+
+            <h2>Detection Result</h2>
+
+            <p>
+                <strong>Predicted Disease:</strong>
+                {{ result.predicted_disease }}
+            </p>
+
+            <p>
+                <strong>Confidence:</strong>
+                {{ result.confidence }}%
+            </p>
+
+            <p>
+                <strong>Recommendation:</strong>
+            </p>
+
+            <p>{{ result.recommendation }}</p>
+
+            {% if result.image_path %}
+                <p>
+                    <strong>Uploaded Image:</strong>
+                </p>
+                <img src="{{ url_for('static', filename=result.image_path) }}"
+                     alt="Uploaded crop leaf"
+                     style="max-width:100%; max-height:250px; border-radius:8px;">
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+    <div class="back-container">
+        <a href="{{ url_for('index') }}" class="back-btn">
+            Back to Home
+        </a>
+    </div>
+
+</div>
+
+<script>
+    const imageInput = document.getElementById("leaf_image");
+    const preview = document.getElementById("imagePreview");
+    const previewImage = document.getElementById("previewImage");
+
+    imageInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) {
+            preview.style.display = "none";
+            previewImage.src = "";
+            return;
+        }
+
+        const allowedTypes = ["image/jpeg", "image/png"];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please upload a JPG or PNG image.");
+            this.value = "";
+            preview.style.display = "none";
+            return;
+        }
+
+        previewImage.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    });
+</script>
+
+</body>
+</html>

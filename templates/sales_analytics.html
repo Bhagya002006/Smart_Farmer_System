@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sales Analytics | Smart Farmer System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f1;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #21632e;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 28px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-left: 5px solid #287c32;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            color: #687568;
+            font-size: 15px;
+        }
+
+        .stat-card h2 {
+            margin: 14px 0 0;
+            color: #21632e;
+            font-size: 27px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .card h2 {
+            color: #285b32;
+            margin-top: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 13px;
+            border: 1px solid #dce5dc;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        tr:hover {
+            background: #f6faf5;
+        }
+
+        .empty-message {
+            background: #fff5e6;
+            color: #805b20;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .back-btn {
+            display: block;
+            width: fit-content;
+            margin: 25px auto;
+            padding: 12px 20px;
+            background: #287c32;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #195c24;
+        }
+
+        @media(max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📊 Sales Analytics Dashboard</h1>
+
+    <p class="subtitle">
+        Monitor crop sales, income and business performance.
+    </p>
+
+    <div class="dashboard">
+
+        <div class="stat-card">
+            <h3>Total Sales Revenue</h3>
+            <h2>₹{{ total_revenue|default(0) }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Quantity Sold</h3>
+            <h2>{{ total_quantity|default(0) }} kg</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Transactions</h3>
+            <h2>{{ total_transactions|default(0) }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Average Sale Value</h3>
+            <h2>₹{{ average_sale|default(0) }}</h2>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Crop-wise Sales Performance</h2>
+
+        {% if crop_sales %}
+
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Crop Name</th>
+                        <th>Total Quantity Sold (kg)</th>
+                        <th>Total Revenue (₹)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for item in crop_sales %}
+                    <tr>
+                        <td>{{ item.crop_name }}</td>
+                        <td>{{ item.total_quantity }}</td>
+                        <td>₹{{ item.total_revenue }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p class="empty-message">
+                No crop sales records available.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="card">
+
+        <h2>Sales History</h2>
+
+        {% if sales_data %}
+
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sale ID</th>
+                        <th>Crop Name</th>
+                        <th>Quantity Sold (kg)</th>
+                        <th>Income (₹)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for sale in sales_data %}
+                    <tr>
+                        <td>{{ sale.sale_id }}</td>
+                        <td>{{ sale.crop_name }}</td>
+                        <td>{{ sale.quantity_sold }}</td>
+                        <td>₹{{ sale.income }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p class="empty-message">
+                No sales history available.
+                Start recording sales to see your analytics.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-btn">
+        Back to Home
+    </a>
+
+</div>
+
+</body>
+</html>

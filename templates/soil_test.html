@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Testing | Smart Farmer System</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f2f7f1;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+        }
+
+        h1, h2 { color: #21632e; }
+
+        h1 { text-align: center; }
+
+        label {
+            display: block;
+            margin: 16px 0 8px;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd8ca;
+            border-radius: 6px;
+        }
+
+        button, .back-btn {
+            display: inline-block;
+            padding: 12px 18px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            background: #287c32;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button:hover, .back-btn:hover {
+            background: #195c24;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .success { background: #e4f5e5; color: #21632e; }
+        .error { background: #fff0f0; color: #a32626; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #dce5dc;
+            text-align: center;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        .empty {
+            padding: 15px;
+            background: #fff5e6;
+            border-radius: 6px;
+        }
+
+        @media(max-width: 600px) {
+            body { padding: 12px; }
+            .card { padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>🌱 Soil Testing</h1>
+
+    <div class="card">
+        <h2>Enter Soil Test Details</h2>
+
+        {% if message %}
+            <div class="message {{ message_type }}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        {% if lands %}
+            <form method="POST" action="{{ url_for('soil_test') }}">
+
+                <label for="land_id">Select Farmer's Land</label>
+
+                <select name="land_id" id="land_id" required>
+                    <option value="">Choose Land</option>
+
+                    {% for land in lands %}
+                        <option value="{{ land[0] }}">
+                            Land ID: {{ land[0] }} |
+                            {{ land[1] }} |
+                            {{ land[2] }} |
+                            Soil: {{ land[3] }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="ph_value">Soil pH Value</label>
+
+                <input
+                    type="number"
+                    name="ph_value"
+                    id="ph_value"
+                    min="0"
+                    max="14"
+                    step="0.1"
+                    placeholder="Enter pH value (0 to 14)"
+                    required
+                >
+
+                <button type="submit">Save Soil Test</button>
+            </form>
+        {% else %}
+            <p class="empty">
+                No land records found. Add a farmer's land before recording a soil test.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Previous Soil Test Records</h2>
+
+        {% if soil_records %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Test ID</th>
+                        <th>Farmer</th>
+                        <th>Land Location</th>
+                        <th>Soil Type</th>
+                        <th>pH Value</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for record in soil_records %}
+                        <tr>
+                            <td>{{ record[0] }}</td>
+                            <td>{{ record[1] }}</td>
+                            <td>{{ record[2] }}</td>
+                            <td>{{ record[3] }}</td>
+                            <td>{{ record[4] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty">No soil test records available yet.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-btn">
+        Back to Home
+    </a>
+
+</div>
+</body>
+</html>

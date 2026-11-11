@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farmers & Available Crops</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            font-family: Arial, sans-serif;
+            background: #f4f7f2;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #205b2c;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn,
+        .dashboard-btn,
+        .order-btn {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #287c32;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn:hover,
+        .dashboard-btn:hover,
+        .order-btn:hover {
+            background: #195c24;
+        }
+
+        .farmer-card {
+            background: white;
+            padding: 22px;
+            margin: 22px 0;
+            border-radius: 10px;
+            border: 1px solid #dce7dc;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .farmer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        h2 {
+            color: #205b2c;
+            margin-top: 0;
+        }
+
+        .farmer-details {
+            line-height: 1.8;
+            color: #526052;
+        }
+
+        h3 {
+            color: #285f32;
+            margin-top: 25px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #dce5dc;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #e8f3e8;
+            color: #244d2b;
+        }
+
+        select,
+        input[type="number"] {
+            padding: 9px;
+            border: 1px solid #bdcdbd;
+            border-radius: 5px;
+            width: 120px;
+        }
+
+        .order-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .empty-message {
+            background: #f8fbf7;
+            padding: 15px;
+            border-radius: 6px;
+            color: #657365;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 12px;
+            }
+
+            .farmer-card {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Farmers & Available Crops</h1>
+
+    <a href="{{ url_for('index') }}" class="back-btn">
+        Back to Home
+    </a>
+
+    {% if farmers %}
+
+        {% for farmer in farmers %}
+
+        <div class="farmer-card">
+
+            <div class="farmer-header">
+
+                <div>
+                    <h2>{{ farmer.name }}</h2>
+
+                    <div class="farmer-details">
+                        <strong>Farmer ID:</strong> {{ farmer.farmer_id }}<br>
+                        <strong>Phone:</strong> {{ farmer.phone }}<br>
+                        <strong>Address:</strong> {{ farmer.address }}
+                    </div>
+                </div>
+
+                <a href="{{ url_for('farmer_dashboard', farmer_id=farmer.farmer_id) }}"
+                   class="dashboard-btn">
+                    View Farmer Dashboard
+                </a>
+
+            </div>
+
+            <h3>Available Crops</h3>
+
+            {% if farmer.crops %}
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Crop ID</th>
+                            <th>Crop Name</th>
+                            <th>Price per kg</th>
+                            <th>Available Quantity (kg)</th>
+                            <th>Season</th>
+                            <th>Place Order</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for crop in farmer.crops %}
+
+                        <tr>
+                            <td>{{ crop.crop_id }}</td>
+
+                            <td>{{ crop.crop_name }}</td>
+
+                            <td>₹{{ crop.price }}</td>
+
+                            <td>{{ crop.quantity }}</td>
+
+                            <td>{{ crop.season }}</td>
+
+                            <td>
+
+                                <form method="POST"
+                                      action="{{ url_for('orders') }}"
+                                      class="order-form">
+
+                                    <input type="hidden"
+                                           name="crop_id"
+                                           value="{{ crop.crop_id }}">
+
+                                    <select name="consumer_id" required>
+                                        <option value="">Select Consumer</option>
+
+                                        {% for consumer in consumers %}
+                                            <option value="{{ consumer[0] }}">
+                                                {{ consumer[1] }}
+                                                (ID: {{ consumer[0] }})
+                                            </option>
+                                        {% endfor %}
+
+                                    </select>
+
+                                    <input type="number"
+                                           name="quantity_kg"
+                                           min="1"
+                                           max="{{ crop.quantity }}"
+                                           placeholder="Quantity"
+                                           required>
+
+                                    <button type="submit" class="order-btn">
+                                        Order
+                                    </button>
+
+                                </form>
+
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <p class="empty-message">
+                    This farmer currently has no available crops.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="farmer-card">
+            <h3>No Farmers Found</h3>
+            <p>Please add farmers and their crops first.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
